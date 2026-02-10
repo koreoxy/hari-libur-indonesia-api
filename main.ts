@@ -34,37 +34,37 @@ async function scrapeLiburIndonesia(year: number) {
   const res = await fetch(url);
 
   if (!res.ok) {
-    throw new Error('Gagal mengambil data dari tanggalan.com');
+    throw new Error("Gagal mengambil data dari tanggalan.com");
   }
 
   const html = await res.text();
-  const document = new DOMParser().parseFromString(html, 'text/html');
+  const document = new DOMParser().parseFromString(html, "text/html");
 
   if (!document) {
-    throw new Error('Gagal parsing HTML');
+    throw new Error("Gagal parsing HTML");
   }
 
-  const results: Array<{
+  const results: {
     date: string;
     title: string;
-    type: 'libur_nasional' | 'cuti_bersama' | 'hari_besar';
-  }> = [];
+    type: "libur_nasional" | "cuti_bersama" | "hari_besar";
+  }[] = [];
 
-  const holidayElements = document.querySelectorAll('.holiday, .libur');
+  const holidayElements = document.querySelectorAll(".holiday, .libur");
 
   holidayElements.forEach((el) => {
-    const dateEl = el.querySelector('.date');
-    const titleEl = el.querySelector('.title');
+    const dateEl = el.querySelector(".date");
+    const titleEl = el.querySelector(".title");
 
     if (!dateEl || !titleEl) return;
 
-    const rawDate = dateEl.textContent?.trim() ?? '';
-    const title = titleEl.textContent?.trim() ?? '';
+    const rawDate = dateEl.textContent?.trim() ?? "";
+    const title = titleEl.textContent?.trim() ?? "";
 
-    let type: 'libur_nasional' | 'cuti_bersama' | 'hari_besar' = 'hari_besar';
+    let type: "libur_nasional" | "cuti_bersama" | "hari_besar" = "hari_besar";
 
-    if (/libur nasional/i.test(title)) type = 'libur_nasional';
-    if (/cuti bersama/i.test(title)) type = 'cuti_bersama';
+    if (/libur nasional/i.test(title)) type = "libur_nasional";
+    if (/cuti bersama/i.test(title)) type = "cuti_bersama";
 
     results.push({ date: rawDate, title, type });
   });
@@ -72,6 +72,8 @@ async function scrapeLiburIndonesia(year: number) {
   await setCachedLibur(year, results);
   return results;
 }
+
+
 (year: number) {
   const url = `https://www.tanggalan.com/${year}`;
   const res = await fetch(url);
